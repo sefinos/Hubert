@@ -6,10 +6,6 @@ import {
 } from "./state.js";
 import { recordHistory } from "./history.js";
 
-// Monotonically increasing - deliberately NOT derived from the current
-// signals array, since signals can now be deleted. Using the live
-// count would let a new signal reuse a just-freed id or Y slot that a
-// surviving signal already occupies.
 let inputSignalCount = 0;
 let outputSignalCount = 0;
 
@@ -18,10 +14,6 @@ export function resetSignalCounters() {
     outputSignalCount = 0;
 }
 
-// Called after undo restores a snapshot of signals, so the counters
-// stay ahead of whatever ids came back - otherwise a new signal added
-// after an undo could collide with a restored id (resetSignalCounters
-// alone would just go back to 0 and immediately collide with IN1/OU1).
 export function syncSignalCounters() {
     let maxIn = 0;
     let maxOut = 0;
@@ -39,10 +31,7 @@ export function syncSignalCounters() {
 }
 
 // Spreadsheet-style column naming: 1 -> A, 26 -> Z, 27 -> AA, 28 -> AB,
-// and so on indefinitely. `String.fromCharCode(65 + (n-1))` alone only
-// covers the first 26 inputs before it starts printing garbage
-// characters, so once a circuit has more inputs than the alphabet this
-// takes over instead of running out of letters.
+
 function letterName(n) {
     let label = "";
     while (n > 0) {
@@ -64,11 +53,6 @@ addInputSignalButton.addEventListener("click", () => {
         node: false,
         nodeId: `IN(N)${n}`,
         x: 0,
-        // Row centre is offset by half the grid size (not a plain
-        // constant) so the connector node - itself centred in the
-        // middle of this box - lands exactly on a grid line, the same
-        // way every gate port already does. See renderInputSignal /
-        // .input-signal-node for the node's own centring math.
         y: ((n - 1) * gridSize) + (gridSize / 2)
     };
     recordHistory();
@@ -80,9 +64,6 @@ addOutputSignalButton.addEventListener("click", () => {
     const n = outputSignalCount;
     const newOutputSignal = {
         type: "output",
-        // Auto-named "Y1", "Y2"... to match the fallback label the
-        // truth table already uses, so the circle on the canvas and
-        // the truth table column header always agree by default.
         name: `Y${n}`,
         id: `OU${n}`,
         state: false,
