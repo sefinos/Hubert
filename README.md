@@ -1,2 +1,1 @@
-# Hubert
-Boolean Algebra Simulator
+
