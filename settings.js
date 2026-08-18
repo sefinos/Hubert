@@ -1,14 +1,3 @@
-// Settings panel. Built and appended to <body> once (as a fixed-position
-// overlay, like the gate-info popovers) so it always sits above every
-// panel and isn't constrained by the app's grid layout. It slides in
-// from the right over the existing screen rather than navigating to a
-// separate page - the app has no routing/history to preserve, so a
-// panel-over-content overlay keeps things simple while still reading
-// like a distinct "settings page".
-//
-// Theme and Grid Snap Size are both live and persisted (localStorage);
-// everything else in the panel is still a placeholder for later.
-
 import { gates, signals, gridSize, setGridSize, simulationSpeed, setSimulationSpeed } from "./state.js";
 import { recordHistory } from "./history.js";
 
@@ -17,11 +6,6 @@ const settingsButton = document.getElementById("settingsButton");
 const THEME_KEY = "hubert-theme";
 const GRID_SIZE_KEY = "hubert-grid-size";
 const SIM_SPEED_KEY = "hubert-sim-speed";
-
-// Sizes deliberately stop short of extremes: a two-input gate is 3
-// grid cells wide, so anything much smaller starts crowding gates and
-// their wires together, and anything much larger just wastes canvas
-// space without adding functionality.
 const GRID_SIZES = [20, 25, 30];
 
 function buildSettingsPanel() {
@@ -99,7 +83,7 @@ function buildSettingsPanel() {
                 </button>
                 <div class="shortcuts-panel" id="aboutPanel" role="region" aria-label="About Hubert">
                     <div class="shortcuts-panel-inner shortcuts-panel-inner--about">
-                        <p class="about-panel-text">Hubert is a browser-based logic gate circuit simulator - place gates, wire them together, and watch signals propagate in real time. Built as an ongoing personal project.</p>
+                        <p class="about-panel-text">Built as an ongoing personal project.</p>
                     </div>
                 </div>
             </div>
@@ -143,12 +127,6 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && isOpen()) closeSettings();
 });
 
-// ---- Theme (Dark / Light) -------------------------------------------
-// A tiny inline script in index.html's <head> already applies the
-// stored theme before first paint (to avoid a dark->light flash), so
-// this only needs to keep that in sync going forward and update the
-// button's label to match.
-
 const themeButton = panel.querySelector("#themeToggleButton");
 const themeValue = panel.querySelector("#themeToggleValue");
 
@@ -170,16 +148,7 @@ themeButton.addEventListener("click", () => {
     applyTheme(currentTheme() === "light" ? "dark" : "light");
 });
 
-// Sync the label with whatever the head script already applied - no
-// need to re-apply the attribute, just reflect it in the UI.
 themeValue.textContent = currentTheme() === "light" ? "Light" : "Dark";
-
-// ---- Grid Snap Size ---------------------------------------------------
-// Every placed gate/signal is sized in CSS purely off --grid-size (see
-// style.css), so resizing them on the fly is just a matter of changing
-// that one variable - the part that needs real work here is rescaling
-// each component's *position* by the same ratio so everything still
-// lands on the new grid lines instead of drifting off them.
 
 const gridScaleGroup = panel.querySelector("#gridScaleGroup");
 const gridScaleButtons = Array.from(panel.querySelectorAll(".grid-scale-btn"));
@@ -196,13 +165,6 @@ function setGridSizeVar(size) {
     document.documentElement.style.setProperty("--grid-size", `${size}px`);
 }
 
-// Repositions every already-placed gate and signal so it lands on the
-// same relative grid spot under the new size. Every stored x/y was
-// originally a clean multiple of the old grid size (gates, via
-// snapToGrid) or a half-cell offset of it (signals, via the
-// `(n-1)*gridSize + gridSize/2` formula in signals.js) - scaling both
-// by the same ratio reproduces that same formula for the new size
-// exactly, no re-snapping/rounding needed.
 function rescalePlacedComponents(oldSize, newSize) {
     const ratio = newSize / oldSize;
 
@@ -247,9 +209,6 @@ gridScaleGroup.addEventListener("click", (e) => {
     applyGridSize(Number(btn.dataset.size));
 });
 
-// Restore a stored grid size on load. Nothing's been placed on the
-// canvas yet at this point, so there's nothing to rescale or undo -
-// just line the variable and the button state up with what was saved.
 const storedGridSize = Number(localStorage.getItem(GRID_SIZE_KEY));
 if (GRID_SIZES.includes(storedGridSize)) {
     applyGridSize(storedGridSize, { persist: false, rescale: false });
@@ -257,23 +216,12 @@ if (GRID_SIZES.includes(storedGridSize)) {
     markActiveGridButton(gridSize);
 }
 
-// ---- Expand/collapse accordions (Keyboard Shortcuts, About) -----------
-// Both expand in place under their own trigger button, the same
-// "slide" feel as the settings panel itself sliding in, rather than
-// popping up as a separate overlay. Shared setup since the two behave
-// identically - only their button/panel elements differ.
-
 function setupAccordion(button, contentPanel) {
     function setOpen(shouldOpen) {
         button.classList.toggle("is-active", shouldOpen);
         button.setAttribute("aria-expanded", String(shouldOpen));
 
         if (shouldOpen) {
-            // max-height can't transition to/from "auto", so measure the
-            // content's natural height and transition to that exact
-            // pixel value instead - otherwise an arbitrary large
-            // max-height would leave a pause at the end of the
-            // animation before it "catches".
             contentPanel.style.maxHeight = `${contentPanel.scrollHeight}px`;
         } else {
             contentPanel.style.maxHeight = "0px";
@@ -288,11 +236,6 @@ function setupAccordion(button, contentPanel) {
 setupAccordion(panel.querySelector("#shortcutsToggleButton"), panel.querySelector("#shortcutsPanel"));
 setupAccordion(panel.querySelector("#aboutToggleButton"), panel.querySelector("#aboutPanel"));
 
-// ---- Simulation Speed (Normal / Instant) ------------------------------
-// Purely a rendering choice, so it's read live off state.js's
-// simulationSpeed binding by wires.js's draw loop every frame - nothing
-// here needs to trigger a redraw or touch history, unlike grid size
-// which actually repositions components.
 
 const simSpeedButton = panel.querySelector("#simSpeedToggleButton");
 const simSpeedValue = panel.querySelector("#simSpeedToggleValue");
