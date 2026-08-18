@@ -7,13 +7,6 @@
     --text-muted: #9aa0a6;
     --text-secondary: #cfd3d6;
     --text-tertiary: #b7bcc1;
-
-    /* Layered "surface" scale used by every card/button/panel in the
-       chrome (mode switcher, gate palette, action bar, settings panel,
-       popovers, truth table, etc). Surfaces are ordered by how far off
-       the page background they sit, NOT by absolute lightness - in the
-       light theme below several of these get darker rather than
-       lighter to keep the same relative "sits above" relationship. */
     --surface-1: #3a3a3a;
     --surface-2: #333333;
     --surface-3: #2c2c2c;
@@ -28,17 +21,8 @@
     --scrollbar-thumb: #5c5c5c;
 
     --grid-line-colour: #333;
-
-    /* Text colour used on top of a solid accent fill (active mode/
-       action pills). Accents are mid-tone in both themes, so dark text
-       keeps working regardless of which theme is active. */
     --on-accent-text: #1e1e1e;
-    /* Gate bodies and signal circles keep their own saturated colours
-       in both themes, so their labels stay a fixed light colour rather
-       than following --text-colour. */
     --gate-label-colour: #f3f3f3;
-    /* The little "notch" a wire plugs into on each gate/signal edge -
-       a fixed dark pin colour in both themes, like a component lead. */
     --node-notch-colour: #1e1e1e;
 
     --off-colour: #600000;
@@ -60,20 +44,8 @@
     --equation-accent: #D9587A;
 
     --mono-font: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-
-    /* Spacing unit the whole canvas snaps to - gate/signal/node sizes
-       below are all expressed as multiples of this so changing it (see
-       the Grid Snap Size setting) rescales every component in one
-       place. Kept in sync with state.js's `gridSize` by settings.js. */
     --grid-size: 25px;
 }
-
-/* ---- Light theme ---- */
-/* Toggled by setting data-theme="light" on <html> (see settings.js).
-   Only the chrome's surface/border/text tokens change - gate bodies,
-   signal on/off colours, and every accent colour stay exactly the same
-   in both themes, so a circuit looks like the same circuit either way
-   and only the "paper" around it changes. */
 :root[data-theme="light"] {
     --background-colour: #e9edf1;
     --panel-colour: #ffffff;
@@ -119,12 +91,6 @@ body {
     min-width: 0;  /* lets grid/flex children shrink below their content size instead of overflowing */
     min-height: 0;
 }
-
-/* The whole app is one responsive grid. Column/row sizes and gaps use
-   clamp()/fr so everything scales smoothly as the window is resized;
-   the breakpoints further down only change *structure* (e.g. the
-   side-bar flipping from a left column to a horizontal strip) once
-   there just isn't room for the desktop arrangement any more. */
 .panels-container { 
     display: grid;
     height: 100vh;
@@ -172,7 +138,7 @@ body {
     padding: 0 18px;
 }
 
-/* ---- Mode switcher (Free Build / Learn / Challenge) ---- */
+/* Mode switcher */
 
 .mode-switcher {
     display: flex;
@@ -228,12 +194,6 @@ body {
 .mode-btn--freebuild { --accent: var(--and-accent); }
 .mode-btn--learn { --accent: var(--input-accent); }
 .mode-btn--challenge { --accent: var(--xor-accent); }
-
-/* ---- Locked modes (Learn / Challenge aren't built yet) ---- */
-/* Same button, dimmed and inert, with a small lock badge standing in
-   for the label's usual role - reusing the app's existing badge
-   pattern (the round "i" info buttons on each gate) rather than
-   inventing a new visual language. */
 .mode-btn.is-locked {
     cursor: not-allowed;
     opacity: 0.5;
@@ -329,11 +289,8 @@ body {
     stroke-linejoin: round;
 }
 
-/* ---- Settings panel ---- */
-/* Slides in from the right over the existing screen when the cog
-   button is pressed, covering ~65% of the viewport. Built and appended
-   to <body> by settings.js so it sits above the app grid entirely,
-   rather than being constrained to any one panel. */
+/* Settings panel */
+
 
 .settings-backdrop {
     position: fixed;
@@ -499,12 +456,6 @@ body {
 }
 
 /* ---- Grid Snap Size row ---- */
-/* Same card treatment as the other settings options, but instead of a
-   single click target it holds a small segmented scale of the grid
-   sizes that still leave enough room to build a circuit (see the
-   GRID_SIZES list in settings.js) - a two-input gate is 3 cells wide,
-   so anything much smaller than this range starts crowding gates
-   together, and anything much larger wastes canvas space. */
 .settings-option-row {
     --accent: var(--output-accent);
 
@@ -558,12 +509,7 @@ body {
 }
 
 /* ---- Keyboard Shortcuts (expand/collapse) ---- */
-/* Slides open beneath its own trigger button (rather than a popover or
-   a second modal) so it reads as part of the same settings list. Uses
-   max-height rather than display:none so the reveal itself can
-   transition smoothly - max-height can't transition to/from "auto",
-   so settings.js sets the open height inline from the content's
-   measured scrollHeight rather than relying on a fixed guess here. */
+
 .settings-option-chevron {
     width: 16px;
     height: 16px;
@@ -644,9 +590,7 @@ body {
     border-top: 1px solid var(--border-muted);
 }
 
-/* About Hubert reuses the same expandable panel treatment as Keyboard
-   Shortcuts, just recoloured to its own accent and holding a plain
-   paragraph instead of a shortcut list. */
+
 .shortcuts-panel-inner--about {
     border-left-color: var(--table-accent);
 }
@@ -1028,11 +972,6 @@ body {
 }
 
 /* ---- Bottom-bar: one scrolling column (actions row + truth table) --- */
-/* #bottom-bar itself never changes size - it's the +Input/+Output
-   circles' positioning anchor and stays exactly as tall as its grid
-   row. All scrolling happens in .bottom-bar-scroll, an inset overlay
-   that owns its own scrollbar on the right edge of the panel. The
-   circles live outside it, so they never scroll away. */
 
 .bottom-bar-scroll {
     position: absolute;
@@ -1058,10 +997,6 @@ body {
     border-radius: 4px;
 }
 
-/* Top row of the bottom bar: the equation panel takes up the middle/
-   left space, the action buttons dock in a compact 2-column grid on
-   the right. The truth table (a sibling of this, further down) stays
-   completely separate and only appears below when scrolled to. */
 .bottom-bar-main {
     flex: 0 0 auto;
     display: flex;
@@ -1148,11 +1083,6 @@ body {
 }
 
 /* ---- Boolean equation panel ---- */
-/* Lives in the middle/left of the bottom bar's top row, next to the
-   action-button grid. Idle until "Create Equation" is pressed, at
-   which point it fills with one "label = expression" row per output
-   signal - mirroring the truth table's own on-demand, re-clickable
-   pattern rather than updating live on every wire change. */
 
 .equation-panel {
     flex: 0 1 480px;
@@ -1370,12 +1300,6 @@ body {
     font-weight: 700;
 }
 
-/* Every placed component is sized in whole grid cells so it always
-   lines up with the canvas's own grid lines: a signal circle is one
-   cell across, a two-input gate is 3x2 cells, and a NOT gate is 2x2.
-   Changing --grid-size (see the Grid Snap Size setting) rescales all
-   of them - and the node pins below - in one place, with no JS
-   involved for already-placed components. */
 .input-signals {
     position: relative;
     top: 0;
@@ -1391,10 +1315,7 @@ body {
 .signal-label {
     pointer-events: none;
 }
-/* Small square pin, half-tucked behind the circle's own edge and half
-   poking out into the canvas, sized as a fixed fraction of a grid cell
-   so wires visibly connect at the edge rather than a bar sitting on
-   top of the letter. */
+
 .input-signal-node,
 .output-signal-node {
     position: absolute;
@@ -1457,11 +1378,6 @@ body {
 .xor-Gate { background-color: #7C4570; }
 .xnor-Gate { background-color: #6E6E30; }
 
-/* Node pins sit at a fixed fraction of a grid cell so they scale
-   together with the gate body: the two-input top/bottom pins sit at
-   the gate's top-left/bottom-left corners, and the single output/NOT
-   pins sit vertically centred (one grid cell down minus half the pin's
-   own size) on the opposite edge. */
 .inputNodeTop,
 .inputNodeBottom,
 .inputNodeSingle,
@@ -1489,13 +1405,6 @@ body {
     right: calc(var(--grid-size) * -0.2);
 }
 /* ---- Delete mode ---- */
-/* Activated via the "Delete" toggle in the bottom bar. While active,
-   hovering a placed gate or signal outlines it in the delete accent
-   (mirroring the app's existing outline-based hover/focus treatment)
-   and clicking it removes it, along with any wires attached to it -
-   see delete-mode.js. Hovering a bare wire (empty canvas) highlights
-   just that wire instead, and clicking removes only the wire - see
-   the hit-testing in wires.js. */
 
 #workspace.delete-mode {
     cursor: crosshair;
@@ -1516,15 +1425,7 @@ body {
     cursor: pointer;
 }
 
-/* =====================================================================
-   Responsive breakpoints
-   =====================================================================
-   The base rules above already scale fluidly with clamp()/fr as the
-   window resizes. These breakpoints handle the point where the desktop
-   two-column arrangement genuinely runs out of room and needs to
-   restructure rather than just shrink. */
 
-/* ---- Narrow viewports (tablet / narrow window): stack everything in
    one column and turn the gate palette into a horizontal strip ---- */
 @media (max-width: 900px) {
     .panels-container {
@@ -1577,11 +1478,6 @@ body {
         min-width: 148px;
     }
 
-    /* The +Input/+Output circles were pinned to the left edge of the
-       bottom bar so they could overlap into the side-bar column next
-       to them. There's no side-bar column here any more (it's now a
-       horizontal strip above the workspace), so they move fully
-       inside the bottom bar instead of hanging off its edge. */
     .addSignal {
         left: 8px;
     }
@@ -1593,15 +1489,7 @@ body {
         flex-direction: column;
     }
 
-    /* flex: 0 1 480px on .equation-panel sets its *width* in the
-       desktop row layout above, but flex-basis tracks the main axis -
-       once .bottom-bar-main switches to a column here that same value
-       was being applied to the panel's height instead, forcing a
-       480px-tall box that's mostly empty. Reset the basis and drive
-       sizing from width/max-width instead, which stay meaningful
-       regardless of flex direction. min-width is dropped too since a
-       260px floor doesn't leave enough room on narrow phones once the
-       bar is this tight. */
+
     .equation-panel {
         flex: 0 1 auto;
         width: 100%;
@@ -1609,10 +1497,6 @@ body {
         max-width: 480px;
     }
 
-    /* Four full-label buttons in one row (repeat(4, auto)) only fits
-       comfortably on wider tablets - anywhere narrower it overflows
-       the bar. Two columns wraps them into a steady 2x2 grid at every
-       width from here down to phones, matching the desktop default. */
     .action-buttons {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
